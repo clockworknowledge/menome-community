@@ -14,12 +14,9 @@ This project aims to create a functional toolset specifically for a close acquai
 
 Given the urgency of this use case, development has prioritized a ChatGPT-based interface for the frontend. By integrating Menome into ChatGPT, users gain access through multiple platforms—Mac, iPhone, iPad, and more—while leveraging the extensive AI capabilities for understanding and interpreting user interactions. This approach provides wide accessibility with minimal setup, making the system available on ChatGPT apps across devices.
 
-## Future Development
+## Current Features
 
 Although the initial release centers on ChatGPT integration, a more traditional frontend is planned. This current implementation, however, provides a solid foundation to meet the immediate needs of the project.
-
-
-More information about the motivation and use cases for the project is available in the [documentation/project_background.md](documentation/project_background.md) file.
 
 Currently supported features are:
 The clockworKnowledge Menome API supports the following interactions:
