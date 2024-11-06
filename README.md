@@ -111,7 +111,7 @@ The agents are structured such that additional agents can be added to the system
 The objective of the project is to provide a flexible and extensible platform for personal knowledge management implimented as an API layer on top of a full-stack application featuring FastAPI backend, Neo4j database, MinIO object storage, and RabbitMQ message broker. A celery task queue is also used for background asyncrhonous processing of long running tasks, such as document decomposition into graph document structure. 
 
 - **FastAPI Backend**: REST API service
-- **Neo4j**: Graph database for data storage
+- **Neo4j**: Graph database for data storage - the base setup uses neo4j community edition via Docker container for local dev/test, but will work with [Neo4j Aura](https://neo4j.com/product/auradb/). 
 - **MinIO**: S3-compatible object storage
 - **RabbitMQ**: Message broker for async operations
 - **Celery**: Task queue for background processing
