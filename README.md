@@ -87,12 +87,15 @@ Thanks to the following:
 ## Technology Stack Overview
 Currently clockworKnowledge Menome is an API layer that has a set of tools for capturing, processing and retrieving knowledge contributed by the user. It is developed using FastAPI backend, Neo4j for database and vector search, MinIO object storage, RabbitMQ message broker, Celery for async processing, Flower for process monitoring and Langchain for RAG. I focused on using openAI API, ChatGPT and Tavily as initial AI model and search providers in order to expedite the development of the project. 
 
-The front end currently leverages ChatGPT GPT application, which is provided as well. I do plan to build a proper react/nextJS front end for the platform in the future, but the immediate goal was to get a functional system up and running. I also wanted to experiment with full AI interactions rather than traditional user interface, so the GPT approach provided the most expedient path to that goal. 
+The front end currently leverages ChatGPT GPT application, which is provided as well. I do plan to build a proper react/nextJS front end for the platform in the future, but the immediate goal was to get a functional system up and running. I also wanted to experiment with full AI interactions rather than traditional user interface, so the GPT approach provided the most expedient path to that goal.
+
+A few notes:
 
 * This code is provided under the Apache 2.0 license as is, without any guarantees or warranties. Use at your own risk.
-* It is provided for educational and research purposes only.
-* The code is for single user personal knowledge management
-* **The security is not production grade.**
+* It is designed for educational and research purposes only.
+* The code is designed for single user personal knowledge management - it is not designed to be a shared system. 
+* **The security is not production grade.** The code does have a basic oAuth token based authentication, but this version is not designed to be an inherently secure, business grade system. 
+* The database is setup to allow for multiple users, but is not multi-tenant in terms of knowledge security or access. Knowledge stored in the system is not secured to a specific user. 
 
 ## Prerequisites
 
@@ -100,11 +103,9 @@ The system is setup to be run on a single machine for development purposes using
 
 The system is currently setup to use chatGPT and OpenAI for LLM processing, so you will need an OpenAI API key. 
 
-**Be aware that the processing costs can add up if you are not careful.**I monitor the costs using the openAI usage dashboard, and I set cost limits in the OpenAI account managment tool to prevent unexpected charges. 
+**Be aware that the processing costs can add up if you are not careful.** I monitor the costs using the openAI usage dashboard, and I set cost limits in the OpenAI account managment tool to prevent unexpected charges. 
 
 It also uses Tavily for external search, so you will need a Tavily API key. Tavily is a paid service, but they do offer a free tier that should be sufficient for development purposes. I have not run into its limits for my use case. 
-
-The agents are structured such that additional agents can be added to the system by adding new python modules in the backend/agents directory. 
 
 ## Stack Components
 
