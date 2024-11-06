@@ -69,7 +69,7 @@ In order to do this, it is necessary to create the ‘web’ of enterprise knowl
 
 ## theLink - Refacorting the Menome datalink to leverage LLMs
 
-The Menome Datalink product was an attempt at building a mulit-agent system that was capable of continously harvesting and integrating data from any structured or unstructured source into a knowledge graph, and making it availble to people to interact with to answer questions etc. 
+The Menome Datalink product was a mulit-agent system that was capable of continously harvesting and integrating data from any structured or unstructured source into a knowledge graph, and making it availble to people to interact with to answer questions etc. 
 
 While the data atomization-> graph pattern aspect of the platform was successful, and worked well, the Q/A and navigation through the graph was not. We were not able to effectively transform user questions into useful results due to limits of technology at the time. Various NLP methods, including LDA, LSI, and others were tried, but none of them were able to provide the results we needed.
 

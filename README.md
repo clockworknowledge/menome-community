@@ -64,17 +64,21 @@ The clockworKnowledge Menome API supports the following interactions:
 
 ## History of Menome
 
-I have been working on the Menome platform since registering the [menome.com](https://www.menome.com) domain in may 2000 - so it has been a long road. I have built probably 10 or more different iterations of the platform over the years, but finally the technology is ready to support the vision. I have provided some of the history in the [documentation/history_of_menome.md](documentation/history_of_menome.md) file.
+I have been working on the Menome platform in some form since registering the [menome.com](https://www.menome.com) domain in may 2000 - culminating with starting Menome Technologies in 2016.
 
 Additional information is available on my [medium blog](https://medium.com/@clockworknowledge).
 
-This project is indebted to the following projects:
-* [Arcurve](https://www.arcurve.com) for supporing the development of this project. 
+I am grateful to everyone who has supported the project over the years - and am particularly indebted to the Menome team and to Arcurve! I have provided some of the history and background in the [documentation/history_of_menome.md](documentation/history_of_menome.md) file.
+
+Thanks to the following:
+* [Menome Team](https://www.menome.com), Menome Advisors, Menome Customers and the Menome Community for bringing the original vision to life through the work we did on dataLink.
+* [Arcurve](https://www.arcurve.com) and the Arcurve team for supporing the development of this project. 
 * [Tomaz Bratanic's article series on RAG, LLMs, Langraph and neo4j](https://medium.com/@bratanic-tomaz)
-* 
+* The great work that neo4j has done in the graph space. 
+
 
 ## Technology Stack Overview
-Currently it is designed to be an API layer on top of a full-stack application featuring FastAPI backend, Neo4j database, MinIO object storage, and RabbitMQ message broker. 
+Currently clockworKnowledge Menome is an API layer that has a set of tools for capturing, processing and retrieving knowledge contributed by the user. It is developed using FastAPI backend, Neo4j for database and vector search, MinIO object storage, RabbitMQ message broker, Celery for async processing, Flower for process monitoring and Langchain for RAG. I focused on using openAI API, ChatGPT and Tavily as initial AI model and search providers in order to expedite the development of the project. 
 
 The front end currently leverages ChatGPT GPT application, which is provided as well. I do plan to build a proper react/nextJS front end for the platform in the future, but the immediate goal was to get a functional system up and running. I also wanted to experiment with full AI interactions rather than traditional user interface, so the GPT approach provided the most expedient path to that goal. 
 
@@ -85,21 +89,15 @@ The front end currently leverages ChatGPT GPT application, which is provided as 
 
 ## Prerequisites
 
-The system is designed to be run on a single machine for development purposes. It is not designed to be a distributed system. It will run on a single machine with Docker Compose. It may be possible to run additional celery workers on other machines, but I havent tested this at this time. 
+The system is setup to be run on a single machine for development purposes using Docker Compose. It is not designed to be a distributed system. It may be possible to run additional celery workers on other machines, but I havent tested this at this time. It can be setup to be hosted on a cloud service using SSL and nginx reverse proxy to provide secured access, but I do not provide details or support for this configuration in this project. 
 
 The system is currently setup to use chatGPT and OpenAI for LLM processing, so you will need an OpenAI API key. 
 
 **Be aware that the processing costs can add up if you are not careful.**I monitor the costs using the openAI usage dashboard, and I set cost limits in the OpenAI account managment tool to prevent unexpected charges. 
 
-Approximate costs for processing a 10 page document with chatGPT is X cents (TODO: insert cost).
-
 It also uses Tavily for external search, so you will need a Tavily API key. Tavily is a paid service, but they do offer a free tier that should be sufficient for development purposes. I have not run into its limits for my use case. 
 
 The agents are structured such that additional agents can be added to the system by adding new python modules in the backend/agents directory. 
-
-- Docker and Docker Compose
-- Python 3.9+
-- pip (Python package installer)
 
 ## Stack Components
 
