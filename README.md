@@ -89,60 +89,6 @@ Currently clockworKnowledge Menome is an API layer that has a set of tools for c
 
 The front end currently leverages ChatGPT GPT application, which is provided as well. I do plan to build a proper react/nextJS front end for the platform in the future, but the immediate goal was to get a functional system up and running. I also wanted to experiment with full AI interactions rather than traditional user interface, so the GPT approach provided the most expedient path to that goal.
 
-## Security & Architecture Notes
-
-### License & Usage
-* This code is provided under the Apache 2.0 license as is, without any guarantees or warranties
-* Designed for educational, research, and personal use
-* Not intended for production deployment without significant security enhancements
-
-### Authentication
-* Implements OAuth 2.0 authentication via Next-Auth
-* Basic session management and token handling
-* No implementation of:
-  - Multi-factor authentication (MFA)
-  - Role-based access control (RBAC)
-  - Advanced session management
-  - IP-based restrictions
-  - Rate limiting
-
-### Data Security
-* Database architecture supports multiple users but is NOT multi-tenant
-* No data isolation or segregation between users:
-  - All chat histories are globally accessible
-  - Knowledge base entries are not user-specific
-  - No user-level access controls on data
-  - No encryption at rest
-* No audit logging or activity tracking
-* No data retention or deletion policies
-
-### API Security
-* Basic API route protection via Next-Auth sessions
-* No implementation of:
-  - API key management
-  - Rate limiting
-  - Request validation
-  - Advanced error handling
-  - Security headers
-
-### Intended Use Case
-* Designed for single-user personal knowledge management
-* Suitable for local development and personal research
-* NOT designed for:
-  - Multi-user production environments
-  - Handling sensitive or regulated data
-  - Business or enterprise use cases
-  - Public-facing deployments
-
-### Security Recommendations for Production
-If you plan to deploy this in a production environment, consider implementing:
-* Proper data isolation and multi-tenancy
-* Enhanced authentication and authorization
-* API security measures
-* Data encryption
-* Audit logging
-* Security monitoring
-* Compliance with relevant data protection regulations
 
 ## Prerequisites
 
@@ -873,7 +819,60 @@ python -m backend.commands.init_stack --force
 2. **MinIO**: Use MinIO Client (mc) for bucket backups
 3. **RabbitMQ**: Export definitions from management console
 
+## Security & Architecture Notes
 
+### License & Usage
+* This code is provided under the Apache 2.0 license as is, without any guarantees or warranties
+* Designed for educational, research, and personal use
+* Not intended for production deployment without significant security enhancements
+
+### Authentication
+* Implements OAuth 2.0 authentication via Next-Auth
+* Basic session management and token handling
+* No implementation of:
+  - Multi-factor authentication (MFA)
+  - Role-based access control (RBAC)
+  - Advanced session management
+  - IP-based restrictions
+  - Rate limiting
+
+### Data Security
+* Database architecture supports multiple users but is NOT multi-tenant
+* No data isolation or segregation between users:
+  - All chat histories are globally accessible
+  - Knowledge base entries are not user-specific
+  - No user-level access controls on data
+  - No encryption at rest
+* No audit logging or activity tracking
+* No data retention or deletion policies
+
+### API Security
+* Basic API route protection via Next-Auth sessions
+* No implementation of:
+  - API key management
+  - Rate limiting
+  - Request validation
+  - Advanced error handling
+  - Security headers
+
+### Intended Use Case
+* Designed for single-user personal knowledge management
+* Suitable for local development and personal research
+* NOT designed for:
+  - Multi-user production environments
+  - Handling sensitive or regulated data
+  - Business or enterprise use cases
+  - Public-facing deployments
+
+### Security Recommendations for Production
+If you plan to deploy this in a production environment, consider implementing:
+* Proper data isolation and multi-tenancy
+* Enhanced authentication and authorization
+* API security measures
+* Data encryption
+* Audit logging
+* Security monitoring
+* Compliance with relevant data protection regulations
 
 ## Contributing
 
