@@ -1,16 +1,23 @@
-# ClockworKnowledge - Menome Personal Knowledge API 
+# Welcome to the Menome Personal Knowledge API
 
-Greetings and welcome to the Menome Personal Knowledge API! This is a platform designed to enable the capture, curate, and manage personal knowledge. 
+Greetings, and welcome to the Menome Personal Knowledge API! This platform is designed to empower individuals to capture, curate, and manage their personal knowledge.
 
-AI offers a unique opportunity to rethink how we interact with information. The goal of this project is to explore the use of AI to augment our ability to capture, organize, and manage our personal knowledge. 
+With recent advances in AI, we have a unique opportunity to [rethink how we engage with knowledge](https://clockworknowledge.medium.com/ai-is-the-new-os-577aa15eb905). The key objective of the project is to leverage AI to enhance people's ability to capture, organize, and maintain personal insights and memories.
 
-The immediate goal of the project is to provide a basic set of tools and commands to help a person with functional memory imparments to be able to capture, organize memories and thoughts and leverage the knowledge they have created over their lifetimeto write their memoirs. I have therefore focused on features that support this goal for the API layer. 
+## Project Goal
 
-![alt text](documentation/images/clockworknowledge-menome.png)
+This project aims to create a functional toolset specifically for a close acquaintance with functional memory challenges. The goal is to help them capture and organize memories and thoughts, ultimately allowing them to utilize their accumulated knowledge to write memoirs. Consequently, the API layer has been developed with features tailored to support this specific need.
 
-Due to the use case for this project, time is a significant factor in terms of the development of the system. As a result, I focused on creating a chatGPT GPT interaction interface for the front end. Taking this approach of embedding the Menome system into ChatGPT also has the advantage of providing the broadest reach in terms enabling Menome to be available in ChatGPT apps for mac, iPhone, iPad etc. while also providing a wide range of AI capabilities for interpreting user interaction and intent on the client with minimal effort. 
+![Clockwork Knowledge Menome](documentation/images/clockworknowledge-menome.png)
 
-I will be looking to develop a more traditional front end in the future, but this provides a good starting point for the immediate goal. 
+## Current Focus: ChatGPT Integration
+
+Given the urgency of this use case, development has prioritized a ChatGPT-based interface for the frontend. By integrating Menome into ChatGPT, users gain access through multiple platforms—Mac, iPhone, iPad, and more—while leveraging the extensive AI capabilities for understanding and interpreting user interactions. This approach provides wide accessibility with minimal setup, making the system available on ChatGPT apps across devices.
+
+## Future Development
+
+Although the initial release centers on ChatGPT integration, a more traditional frontend is planned. This current implementation, however, provides a solid foundation to meet the immediate needs of the project.
+
 
 More information about the motivation and use cases for the project is available in the [documentation/project_background.md](documentation/project_background.md) file.
 
