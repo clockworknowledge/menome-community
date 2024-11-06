@@ -1,0 +1,103 @@
+services:
+  # API Service
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    container_name: api-dev
+    networks:
+      - menome-network-dev
+    environment:
+      - ENV_MODE=development 
+      - NODE_ENV=development
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbit:5672//
+    volumes:
+      - .env:/menome/config/.env.dev
+    ports:
+      - "8000:8000"
+    depends_on:
+      - neo4j-dev
+      - minio-dev
+      - rabbit
+
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3.12-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - menome-network-dev
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    networks:
+      - menome-network-dev
+    environment:
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+      CELERY_NEO4J_URL: ${CELERY_NEO4J_URL}
+      ENV_MODE: development 
+    volumes:
+      - .env/:/menome/config/.env.dev
+    depends_on:
+      - rabbit
+      - neo4j-dev
+
+  flower:
+    image: mher/flower
+    env_file:
+      - .env
+    networks:
+      - menome-network-dev
+    environment:
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbit
+      - celery-worker
+
+  minio-dev:
+    image: minio/minio:latest
+    container_name: minio-dev
+    networks:
+      - menome-network-dev
+    volumes:
+      - ./miniodata:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SECURE: "off"
+    ports:
+      - "9000:9000"   # MinIO API port
+      - "9001:9001"   # MinIO Console port
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  neo4j-dev:
+    image: neo4j:5.22-community
+    container_name: neo4j-dev
+    networks:
+      - menome-network-dev
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - ./neo4jdata/data:/data
+      - ./neo4jdata/logs:/logs
+      - ./neo4jdata/import:/var/lib/neo4j/import
+      - ./neo4jdata/plugins:/plugins
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_PLUGINS: '["apoc","graph-data-science"]'
+
+networks:
+  menome-network-dev:
+    driver: bridge

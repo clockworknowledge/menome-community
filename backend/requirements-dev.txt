@@ -1,0 +1,13 @@
+# requirements-dev.txt
+
+-r requirements.txt
+
+# Testing dependencies
+pytest==7.3.1
+pytest-asyncio==0.21.0
+pytest-mock==3.14.0
+coverage==7.2
+flake8==6.0.0
+black==23.3.0
+mypy==1.4.1
+typer==0.12.5

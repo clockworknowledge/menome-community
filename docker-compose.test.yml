@@ -1,0 +1,120 @@
+services:
+
+  # RabbitMQ Service
+  rabbitmq-test:
+    container_name: rabbitmq-test
+    image: rabbitmq:3.12-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "15672:15672"  # Management UI
+      - "5672:5672"    # AMQP Protocol
+    networks:
+      - menome_network_test
+
+  # Neo4j Service
+  neo4j-test:
+    image: neo4j:5.22-community
+    container_name: neo4j-test
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - ./neo4jtestdata/data:/data
+      - ./neo4jtestdata/logs:/logs
+      - ./neo4jtestdata/import:/var/lib/neo4j/import
+      - ./neo4jtestdata/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=neo4j/test_neo4j_password
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_whitelist=gds.*, apoc.*
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*, apoc.*
+    tmpfs:
+      - /var/lib/neo4j/run
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - menome_network_test
+
+  # MinIO Service
+  minio-test:
+    image: minio/minio
+    container_name: minio-test
+    volumes:
+      - ./miniodata:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - menome_network_test
+
+  # API Service
+  api_test:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    container_name: api-test
+    environment:
+      - ENV_MODE=test 
+      - NODE_ENV=development
+      - MINIO_URL=${MINIO_ENDPOINT}
+    volumes:
+      - .env.test:/menome/config/.env.test
+    ports:
+      - "8000:8000"
+    depends_on:
+      - neo4j-test
+      - minio-test
+    networks:
+      - menome_network_test
+
+  # Celery Worker Service
+  celery_worker_test:
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    container_name: celery_worker_test
+    environment:
+      - ENV_MODE=test
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq-test:5672//
+      - CELERY_NEO4J_BROKER=bolt://neo4j-test:7687
+    volumes:
+      - .env.test:/menome/config/.env.test
+    depends_on:
+      - rabbitmq-test
+      - neo4j-test
+      - minio-test
+    healthcheck:
+      test: ["CMD", "echo", "healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - menome_network_test
+
+networks:
+  menome_network_test:
+    driver: bridge
+
+volumes:
+  neo4j-data-test:
+  minio-data-test:

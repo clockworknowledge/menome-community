@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      { 
+        "name": "Python: Pytest",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+       
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "env": {
+          "ENV_MODE": "test"
+        }
+      },
+           
+      {
+        "name": "Python: FastAPI (backend)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": [
+          "backend.main:app", 
+          "--reload",
+          "--port",
+          "8000",
+          "--host",
+          "0.0.0.0" // If necessary
+        ],
+        "cwd": "${workspaceFolder}", 
+        "env": {
+          "ENV_MODE": "development",
+          "NEO4J_URI": "bolt://localhost:7687"
+        }
+      },
+    ],
+    "justMyCode": false
+  }

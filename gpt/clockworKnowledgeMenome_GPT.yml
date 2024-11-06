@@ -1,0 +1,838 @@
+openapi: 3.1.0
+info:
+  title: menome API
+  description: Provides answers to questions about Documents, followed by a list of Documents with a summary of each one and the URL to the source of the document.
+  version: 1.0.0
+servers:
+  - url: https://your-url.com/api
+    description: Main API server
+
+paths:
+  /documents/document/add-document-from-url:
+    post:
+      operationId: addDocumentFromUrl
+      summary: Adds a document from a specified URL.
+      description: Fetches a document from the specified URL and stores it in the system.
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentRequest'
+      responses:
+        '200':
+          description: Document added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  documentId:
+                    type: string
+                    description: The unique identifier of the added document.
+        '400':
+          description: Bad request - invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+
+  /explore/answer-question:
+    post:
+      operationId: postAnswerQuestion
+      tags:
+        - Explore
+      summary: Answers the question with sources, thoughts and tools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionRequest'
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  question:
+                    type: string
+                    description: The question that was processed.
+                    example: "Who is sam altman?"
+                  answer:
+                    type: string
+                    description: Answer to the question with sources, thoughts, and tools.
+                  setup_duration:
+                    type: number
+                    format: float
+                    description: Time taken to set up the process in seconds.
+                    example: 0.05
+                  response_duration:
+                    type: number
+                    format: float
+                    description: Time taken to generate the response in seconds.
+                    example: 1.20
+                  fetch_duration:
+                    type: number
+                    format: float
+                    description: Time taken to fetch data from Neo4j in seconds.
+                    example: 0.30
+                  total_duration:
+                    type: number
+                    format: float
+                    description: Total time taken to process the request in seconds.
+                    example: 1.55
+        '422':
+          description: Validation Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - OAuth2PasswordBearer: []
+
+  /notes/note:
+    post:
+      tags:
+        - Notes
+      summary: Take a note from the user-provided text.
+      description: Take the name and text provided by the user and map them to the name and note_text fields.
+      operationId: uploadNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotePayload'
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Note uploaded successfully
+        '422':
+          description: Validation Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - OAuth2PasswordBearer: []
+
+  /notes/upload-image-from-openai:
+    post:
+      tags:
+        - Notes
+      summary: Read the text from the image the user provides using gpt4o model and store it with text in a note.
+      description: >
+        Read the text from the image using gpt4o model and send only the files the user provides no others and the text as note_text, and the name.
+        Display that along with the note_text. Only upload the image the user provides. Do not upload the logo.
+      operationId: uploadNoteFromOpenAI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotePayload'
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Note uploaded successfully
+        '422':
+          description: Validation Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - OAuth2PasswordBearer: []
+
+  /documents/generate-share-link/{document_uuid}:
+    post:
+      tags:
+        - Documents
+      summary: Generate a shareable link to a document.
+      description: Allows the user to generate a shareable link to a document.
+      operationId: generateShareLink
+      parameters:
+        - name: document_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  share_link:
+                    type: string
+                    description: The shareable link to the document.
+        '422':
+          description: Validation Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+
+  /research/research-topic:
+    post:
+      tags:
+        - Documents
+      summary: Research and generate an article based on provided topics.
+      description: >
+        Generate a comprehensive research document based on provided topics. The response includes the main research document,
+        topic-specific research, and a list of all sources with summaries and URLs.
+      operationId: generate_research_topic_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateResearchRequest'
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchTopicResponse'
+        '422':
+          description: Validation Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - OAuth2PasswordBearer: []
+
+  /documents/document/{uuid}:
+    get:
+      operationId: getDocument
+      summary: Get a document by UUID
+      tags:
+        - Documents
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The UUID of the document to retrieve
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional token for accessing shared documents
+        - name: format_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, markdown, html]
+            default: json
+          description: The format type to return
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+            text/markdown:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized - Not authenticated
+        '403':
+          description: Forbidden - Invalid token or insufficient permissions
+        '404':
+          description: Document not found
+        '500':
+          description: Internal server error
+      security:
+        - OAuth2PasswordBearer: []
+        - {}  # This allows the endpoint to be accessed without authentication when using a token
+
+  /notes/note/{note_id}:
+    get:
+      summary: Use this endpoint to get a note by its ID and get the image using the url from the files
+      description: >
+        Retrieves a note's text, name, and associated image URLs. The image URLs are provided as links in the files section.
+        Don't be lazy, get the image from the URLs provided and display them for the user.
+      operationId: getNoteById
+      tags:
+        - Notes
+      parameters:
+        - name: note_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the note
+      responses:
+        '200':
+          description: Successful response with note information and image URLs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique identifier of the note
+                  name:
+                    type: string
+                    description: The name or title of the note
+                  note_text:
+                    type: string
+                    description: The full text content of the note
+                  files:
+                    type: array
+                    items:
+                      type: string
+                      format: uri
+                    description: Use the URL in this array to get the image to display it for the user
+        '404':
+          description: Note not found
+        '500':
+          description: Internal server error
+      security:
+        - OAuth2PasswordBearer: []
+
+  /documents/document/add-document-from-url:
+    post:
+      operationId: addDocumentFromUrl
+      summary: Adds a document from a specified URL.
+      description: Fetches a document from the specified URL and stores it in the system.
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentRequest'
+      responses:
+        '200':
+          description: Document added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  documentId:
+                    type: string
+                    description: The unique identifier of the added document.
+        '400':
+          description: Bad request - invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+
+  /explore/find:
+    post:
+      tags:
+        - Explore
+      summary: Find documents using natural language request
+      description: Find documents by time range and type
+      operationId: find_documents_explore_find_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - OAuth2PasswordBearer: []
+
+components:
+  schemas:
+    GenerateResearchRequest:
+      type: object
+      properties:
+        topics:
+          type: array
+          items:
+            type: string
+          description: List of topics to generate research on.
+      required:
+        - topics
+    FindRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          title: Query
+          description: Natural language request to find documents
+      required:
+        - query
+      title: FindRequest
+    QuestionRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          title: Query
+          description: Natural language request to answer questions about documents
+      required:
+        - query
+      title: QuestionRequest
+    ResearchTopicResponse:
+      type: object
+      properties:
+        research_document:
+          $ref: '#/components/schemas/ResearchDocument'
+        topic_research:
+          $ref: '#/components/schemas/TopicResearch'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+          description: List of source documents with summaries and URLs.
+        shareable_links:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: List of shareable links for all generated documents.
+        task_ids:
+          type: array
+          items:
+            type: string
+          description: List of task IDs for background processing.
+        message:
+          type: string
+          description: Status message indicating successful processing.
+      required:
+        - research_document
+        - topic_research
+        - sources
+        - shareable_links
+        - task_ids
+        - message
+
+    ResearchDocument:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier of the main research document.
+        text:
+          type: string
+          description: Full text content of the research document in Markdown format.
+        url:
+          type: string
+          format: uri
+          description: URL to access the full research document.
+        date:
+          $ref: '#/components/schemas/DateTime'
+      required:
+        - uuid
+        - text
+        - url
+        - date
+
+    TopicResearch:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier of the topic-specific research.
+        text:
+          type: string
+          description: Full text content of the topic-specific research.
+        url:
+          type: string
+          format: uri
+          description: URL to access the topic-specific research.
+        date:
+          $ref: '#/components/schemas/DateTime'
+      required:
+        - uuid
+        - text
+        - url
+        - date
+
+    Source:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier of the source document.
+        text:
+          type: string
+          description: Summary or excerpt of the source document.
+        url:
+          type: string
+          format: uri
+          description: Original URL of the source document.
+        date:
+          $ref: '#/components/schemas/DateTime'
+      required:
+        - uuid
+        - text
+        - url
+        - date
+
+    DateTime:
+      type: object
+      properties:
+        _DateTime__date:
+          $ref: '#/components/schemas/Date'
+        _DateTime__time:
+          $ref: '#/components/schemas/Time'
+      required:
+        - _DateTime__date
+        - _DateTime__time
+
+    Date:
+      type: object
+      properties:
+        _Date__ordinal:
+          type: integer
+          description: Ordinal date number.
+        _Date__year:
+          type: integer
+          description: Year component of the date.
+        _Date__month:
+          type: integer
+          description: Month component of the date.
+        _Date__day:
+          type: integer
+          description: Day component of the date.
+      required:
+        - _Date__ordinal
+        - _Date__year
+        - _Date__month
+        - _Date__day
+
+    Time:
+      type: object
+      properties:
+        _Time__ticks:
+          type: integer
+          description: Ticks representing the time.
+        _Time__hour:
+          type: integer
+          description: Hour component of the time.
+        _Time__minute:
+          type: integer
+          description: Minute component of the time.
+        _Time__second:
+          type: integer
+          description: Second component of the time.
+        _Time__nanosecond:
+          type: integer
+          description: Nanosecond component of the time.
+        _Time__tzinfo:
+          type: object
+          description: Time zone information.
+          additionalProperties: true
+      required:
+        - _Time__ticks
+        - _Time__hour
+        - _Time__minute
+        - _Time__second
+        - _Time__nanosecond
+        - _Time__tzinfo
+
+    HTTPValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+      required:
+        - detail
+
+    ValidationError:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: integer
+          description: Location of the error.
+        msg:
+          type: string
+          description: Error message.
+        type:
+          type: string
+          description: Error type.
+      required:
+        - loc
+        - msg
+        - type
+
+    NoteResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the note
+        name:
+          type: string
+          description: Name of the note
+        note_text:
+          type: string
+          description: The text content of the note
+        openaiFileResponse:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs to fetch the associated files
+      required:
+        - id
+        - name
+        - note_text
+        - openaiFileResponse
+
+    NotePayload:
+      type: object
+      required:
+        - name
+        - note_text
+      properties:
+        name:
+          type: string
+          description: Name of the note.
+        note_text:
+          type: string
+          description: The text of the note.
+        openaiFileIdRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpenAIFile'
+
+    OpenAIFile:
+      type: object
+      required:
+        - name
+        - id
+        - mime_type
+        - download_link
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        mime_type:
+          type: string
+          description: MIME type of the file.
+        download_link:
+          type: string
+          format: uri
+
+    ValidTypes:
+      type: string
+      enum:
+        - Document
+        - User Contributed
+        - Generated Research
+        - Agent Contributed
+        - Generated Article
+        - Note
+        - Research
+        - Memory
+
+    DocumentRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: The URL of the document to be added.
+
+    Document:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Unique identifier of the document
+        name:
+          type: string
+          description: Name of the document
+        url:
+          type: string
+          format: uri
+          description: URL of the document
+        text:
+          type: string
+          description: Text content of the document
+        note:
+          type: string
+          description: Additional notes about the document
+        imageurl:
+          type: string
+          format: uri
+          description: URL to the image associated with the document
+        publisher:
+          type: string
+          description: Publisher of the document
+        addeddate:
+          type: string
+          format: date-time
+          description: Date the document was added
+        thumbnail:
+          type: string
+          format: uri
+          description: URL to the document's thumbnail image
+        wordcount:
+          type: integer
+          description: Number of words in the document
+        type:
+          type: string
+          description: Type of the document
+      required:
+        - uuid
+        - name
+        - url
+        - text
+        - addeddate
+        - type
+
+    ExploreResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: Summarizes text from all documents.
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExploreSource'
+
+    ExploreSource:
+      type: object
+      properties:
+        document:
+          $ref: '#/components/schemas/Document'
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+
+    Page:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the page
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageItem'
+          description: Child items of the page
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageItem'
+          description: Questions related to the page
+        summaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Summary'
+          description: Summaries related to the page
+
+    PageItem:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Text content of the page item
+        name:
+          type: string
+          description: Name of the page item
+        uuid:
+          type: string
+          description: Unique identifier of the page item
+      required:
+        - text
+        - name
+        - uuid
+
+    Summary:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Summary text
+        uuid:
+          type: string
+          description: Unique identifier of the summary
+      required:
+        - text
+        - uuid
+
+    DocumentsResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+          description: List of documents found based on the search criteria.
+        totalCount:
+          type: integer
+          description: Total number of documents found.
+      required:
+        - documents
+        - totalCount
+      description: Response containing a list of found documents and the total count.
+
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: /token
+          scopes: {}
