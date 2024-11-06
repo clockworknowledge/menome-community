@@ -89,7 +89,7 @@ Currently clockworKnowledge Menome is an API layer that has a set of tools for c
 
 The front end currently leverages ChatGPT GPT application, which is provided as well. I do plan to build a proper react/nextJS front end for the platform in the future, but the immediate goal was to get a functional system up and running. I also wanted to experiment with full AI interactions rather than traditional user interface, so the GPT approach provided the most expedient path to that goal. 
 
-* This code is provided under the MIT license as is, without any guarantees or warranties. Use at your own risk.
+* This code is provided under the Apache 2.0 license as is, without any guarantees or warranties. Use at your own risk.
 * It is provided for educational and research purposes only.
 * The code is for single user personal knowledge management
 * **The security is not production grade.**
